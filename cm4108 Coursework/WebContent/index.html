@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Submit new appointment information</title>
+	</head>
+	<body>
+		<header>
+			<h1>Submit a new appointment</h1>
+		</header>
+		<section>
+			<form method="post" action="api/appointment">
+				<table>
+					<tr>
+						<td>Date and time:</td>
+						<td>
+							<input name="dateTime" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>Duration:</td>
+						<td>
+							<input name="duration" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>Owner:</td>
+						<td>
+							<input name="owner" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>Description:</td>
+						<td>
+							<input name="description" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button type="submit">Submit Appointment</button>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</section>
+	</body>
+</html>
