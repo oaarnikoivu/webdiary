@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Submit new appointment information</title>
+		<title>Diary App</title>
 		<!-- *** Load the jQuery and jQueryUI libraries here. *** -->		
 	  	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -19,17 +19,65 @@
 	</head>
 	<body>
 		<header>
-			<h1>Submit a new appointment</h1>
+			<h1>Diary App</h1>
 		</header>
 		<section>
-			<form method="post" action="api/appointment">
+			<section id="userRetrieval">
+				User:
+				<input type="text" id="user">
+				From:
+				<input type="date" id="fromDate">
+				To:
+				<input type="date" id="toDate">
+				<button id="showAppointment">Show appointment(s)</button>
+				<button id="addAppointment">Add appointment</button>
+			</section>
+			<section id="addAppointmentPopup">
+				<div class="add-appointment">
+					<div class="header">
+						<h2>Add Appointment</h2>
+					</div>
+					<div class="appointmentForm">
+						<form method="post" action="api/appointment">
+							<table>
+							 <tr>
+								<td>Description:</td>
+								<td>
+									<input name="description" type="text">
+								</td>
+							 </tr>
+							 <tr>
+								<td>Date:</td>
+								<td>
+									<input name="dateTime" type="text" id="datepicker">
+								</td>
+							</tr>
+							<tr>
+								<td>Start time:</td>
+								<td>
+									<input name="startTime" type="text">
+								</td>
+							</tr>
+							<tr>
+								<td>Duration:</td>
+								<td>
+									<input name="duration" type="text"> (minutes)
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<button type="submit" id="saveBtn">Save</button>
+									<button id="cancelBtn">Cancel</button>
+								</td>
+							</tr>
+							</table>
+						</form>
+					</div>
+				</div>
+			</section>
+			<!-- <form method="post" action="api/appointment">
 				<table>
-					<tr>
-						<td>Date and time:</td>
-						<td>
-							<input name="dateTime" type="text">
-						</td>
-					</tr>
+					
 					<tr>
 						<td>Duration:</td>
 						<td>
@@ -54,7 +102,7 @@
 						</td>
 					</tr>
 				</table>
-			</form>
+			</form> -->
 		</section>
 	</body>
 </html>
