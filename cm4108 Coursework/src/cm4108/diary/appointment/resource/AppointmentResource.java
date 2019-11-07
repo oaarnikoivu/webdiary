@@ -90,12 +90,18 @@ public class AppointmentResource {
 		Date date1 = formatToDate(firstDate);
 		Date date2 = formatToDate(secondDate);
 		
-		List<Appointment> appointments = AppointmentResource.database.findAppointmentsBetweenDates(date1.getTime(), date2.getTime());
+		List<Appointment> appointments = AppointmentResource
+				.database.findAppointmentsBetweenDates(date1.getTime(), date2.getTime());
 		
 		return appointments;
 		
 	}
 	
+	/**
+	 * Delete an appointment given by its ID
+	 * @param appointmentId
+	 * @return
+	 */
 	@DELETE
 	@Produces(MediaType.TEXT_PLAIN)
 	@Path("{appointmentId}")
@@ -137,7 +143,6 @@ public class AppointmentResource {
 	 * @throws ParseException
 	 */
 	private Date formatToDate(String dateTime) throws ParseException {
-		// Date formatting
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = sdf.parse(dateTime);
 		return date;
