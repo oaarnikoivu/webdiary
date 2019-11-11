@@ -1,21 +1,28 @@
 body {
 	background-color: lightgrey;
+	font-family: Arial;
+	font-size: 12pt;
 }
 
 h1 {
 	text-align: center;
 }
 
-.add-appointment {
-	align-items: center;
-	margin: 0 auto;
-	background-color: white;
-	border-radius: 4px;
-	width: 40%;
-	font-size: 16px;
+label {
+	display: inline-block;
+	float: left;
+    clear: left;
+    width: 180px;
 }
 
-.header {
+input {
+	display: inline-block;
+}
+
+#appointmentPopup {
 	text-align: center;
-	background-color: red;
+}
+
+#appointmentPopup section {
+	padding: 5px;
 }

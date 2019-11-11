@@ -13,25 +13,28 @@ try	{
 
 function init() {
 	
-	$(function() {
-		$('#addAppointmentPopup').hide();
-	})
+	$('#addAppointmentPopup').dialog({
+		modal:true,
+		autoOpen: false,
+		title: 'Add Appointment',
+		minWidth: 500,
+		minHeight: 280
+	});
 	
 	// add appointment click handler 
 	$('#addAppointment').click(function() {
-		$('#addAppointmentPopup').show();
-	})
+		$('#addAppointmentPopup').dialog('open', true);
+	});
 	
 	// show appointment(s) click hander
 	$('#showAppointment').click(function() {
 		// hide appointment pop up
-		$('#addAppointmentPopup').hide();
+		$('#addAppointmentPopup').dialog('close');
 		
 		//retrieve appointments
 		retrieveAppointments();
 		
-	})
-	
+	});
 	
 	// add date picker 
 	$(function() {
@@ -42,7 +45,7 @@ function init() {
 	// hide appointment on cancel clicked
 	$("#cancelBtn").click(function() {
 		$('#addAppointmentPopup').hide();
-	})
+	});
 }
 
 function retrieveAppointments() {
@@ -59,7 +62,7 @@ function retrieveAppointments() {
 			
 			var htmlCode="<li id='"+date+"'>"+description+"</li>";
 		})
-	})
+	});
 }
 
 

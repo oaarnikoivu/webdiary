@@ -35,48 +35,22 @@
 			<section>
 				<ul id="appointments"></ul>
 			</section>
+			
 			<section id="addAppointmentPopup">
-				<div class="add-appointment">
-					<div class="header">
-						<h2>Add Appointment</h2>
-					</div>
-					<div class="appointmentForm">
-						<form method="post" action="api/appointment">
-							<table>
-							 <tr>
-								<td>Description:</td>
-								<td>
-									<input name="description" type="text">
-								</td>
-							 </tr>
-							 <tr>
-								<td>Date:</td>
-								<td>
-									<input name="dateTime" type="text" id="datepicker">
-								</td>
-							</tr>
-							<tr>
-								<td>Start time:</td>
-								<td>
-									<input name="startTime" type="text">
-								</td>
-							</tr>
-							<tr>
-								<td>Duration:</td>
-								<td>
-									<input name="duration" type="text"> (minutes)
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<button type="submit" id="saveBtn">Save</button>
-									<button id="cancelBtn">Cancel</button>
-								</td>
-							</tr>
-							</table>
-						</form>
-					</div>
-				</div>
+				<section>
+					<label>Description:</label>
+					<input name="description" type="text" id="description"> 
+					<label>Date:</label>
+					<input name="dateTime" type="text" id="datepicker"> 
+					<label>Start time:</label>
+			   		<input name="startTime" type="text" id="startTime">
+					<label>Duration:</label>
+			  		<input name="duration" type="text" id="duration"> (minutes)
+			  		</section>
+			  	<section>
+					<button type="submit" id="saveBtn">Save</button>
+			  		<button id="cancelBtn">Cancel</button>
+				</section>
 			</section>
 		</section>
 	</body>
