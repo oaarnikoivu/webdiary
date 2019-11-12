@@ -6,8 +6,9 @@
 	  	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 		
-			<!-- *** Load jQueryUI default CSS from Google CDN. *** -->
+		<!-- *** Load jQueryUI default CSS from Google CDN. *** -->
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" />
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 
 		<!--  Load the LeafletJS API. -->
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
@@ -26,32 +27,38 @@
 				User:
 				<input type="text" id="user">
 				From:
-				<input type="date" id="fromDate">
+				<input type="text" id="fromDatepicker">
 				To:
-				<input type="date" id="toDate">
+				<input type="text" id="toDatepicker">
+				
 				<button id="showAppointment">Show appointment(s)</button>
 				<button id="addAppointment">Add appointment</button>
 			</section>
+			
 			<section>
 				<ul id="appointments"></ul>
 			</section>
 			
 			<section id="addAppointmentPopup">
 				<section>
+					<label>Owner:</label>
+					<input name="owner" type="text" id="owner">
 					<label>Description:</label>
 					<input name="description" type="text" id="description"> 
 					<label>Date:</label>
-					<input name="dateTime" type="text" id="datepicker"> 
+					<input name="date" type="text" id="addAppointmentDatepicker"> 
 					<label>Start time:</label>
-			   		<input name="startTime" type="text" id="startTime">
+			   		<input name="startTime" type="text" id="timepicker">
 					<label>Duration:</label>
 			  		<input name="duration" type="text" id="duration"> (minutes)
 			  		</section>
 			  	<section>
-					<button type="submit" id="saveBtn">Save</button>
-			  		<button id="cancelBtn">Cancel</button>
+					<button type="submit" id="saveAppointment">Save</button>
+			  		<button id="cancelAppointment">Cancel</button>
 				</section>
 			</section>
 		</section>
+		
+		<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
 	</body>
 </html>

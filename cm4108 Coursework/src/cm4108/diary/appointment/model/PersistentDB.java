@@ -1,5 +1,8 @@
 package cm4108.diary.appointment.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +38,24 @@ public class PersistentDB implements AppointmentDatabase {
 			DynamoDBUtil.getDynamoDBClient(PersistentDB.REGION, PersistentDB.LOCAL_ENDPOINT).createTable(createTableRequest);
 			
 			Appointment testAppointment = new Appointment();
-			testAppointment.setAppointmentId("1");
-			testAppointment.setDateAndTime(157273112154L);
-			testAppointment.setDuration(60);
-			testAppointment.setOwner("Jeff Jeff");
-			testAppointment.setDescription("Testing description");
 			
-			PersistentDB.dynamoDBMapper.save(testAppointment);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
 			
-			System.out.println("SAVED HASH KEY VALUE: " + testAppointment.getAppointmentId());
+			try {
+				Date date = sdf.parse("2019-09-29 13:00:00");
+				
+				testAppointment.setAppointmentId("1");
+				testAppointment.setDateAndTime(date.getTime());
+				testAppointment.setDuration(60);
+				testAppointment.setOwner("Jeff Jeff");
+				testAppointment.setDescription("Testing description");
+				
+				PersistentDB.dynamoDBMapper.save(testAppointment);
+				
+				System.out.println("SAVED HASH KEY VALUE: " + testAppointment.getAppointmentId());
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		return PersistentDB.instance;
 	}
@@ -80,11 +92,11 @@ public class PersistentDB implements AppointmentDatabase {
 	}
 
 	@Override
-	public List<Appointment> findAppointmentsBetweenDates(long firstDate, long secondDate) {
+	public List<Appointment> findAppointmentsBetweenDates(long fromDate, long toDate) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-		
-		eav.put(":date1", new AttributeValue().withN (String.valueOf(firstDate)));
-		eav.put(":date2", new AttributeValue().withN(String.valueOf(secondDate)));
+			
+		eav.put(":date1", new AttributeValue().withN (String.valueOf(fromDate)));
+		eav.put(":date2", new AttributeValue().withN(String.valueOf(toDate)));
 		
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 				.withFilterExpression("dateAndTime >= :date1 and dateAndTime <= :date2")

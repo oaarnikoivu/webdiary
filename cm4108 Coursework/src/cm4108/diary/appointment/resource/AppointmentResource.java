@@ -1,8 +1,7 @@
 package cm4108.diary.appointment.resource;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -37,23 +36,22 @@ public class AppointmentResource {
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response addAppointment(
-			@FormParam("dateTime") String dateTime,
+			@FormParam("date") long date,
 			@FormParam("duration") String duration,
-			@FormParam("owner") String owner,
-			@FormParam("description") String description) {
+			@FormParam("description") String description,
+			@FormParam("owner") String owner) {
 		try {
-			
+					
 			Appointment appointment = new Appointment();
 			
-			Date date = formatToDate(dateTime);
-			
-			appointment.setDateAndTime(date.getTime());
+			appointment.setDateAndTime(date);
 			appointment.setDuration(Double.valueOf(duration));
-			appointment.setOwner(owner);
 			appointment.setDescription(description);
+			appointment.setOwner(owner);
+			
 			
 			AppointmentResource.database.addAppointment(appointment);
-			return Response.status(201).entity("Appointment added.").build();
+			return Response.status(201).entity("Appointment saved.").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).entity("Adding a new appointment has failed.").build();
@@ -75,23 +73,21 @@ public class AppointmentResource {
 	
 	/**
 	 * Retrieve appointments between two specified dates
-	 * @param firstDate
-	 * @param secondDate
+	 * @param fromDate
+	 * @param toDate
 	 * @return
 	 * @throws ParseException
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{firstDate}/{secondDate}")
+	@Path("{owner}/{fromDate}/{toDate}")
 	public List<Appointment> retrieveAppointmentsFromDates(
-			@PathParam("firstDate") String firstDate, 
-			@PathParam("secondDate") String secondDate) throws ParseException {
-		
-		Date date1 = formatToDate(firstDate);
-		Date date2 = formatToDate(secondDate);
-		
+			@PathParam("owner") String owner,
+			@PathParam("fromDate") long fromDate, 
+			@PathParam("toDate") long toDate) throws ParseException {
+			
 		List<Appointment> appointments = AppointmentResource
-				.database.findAppointmentsBetweenDates(date1.getTime(), date2.getTime());
+				.database.findAppointmentsBetweenDates(fromDate, toDate);
 		
 		return appointments;
 		
@@ -135,20 +131,4 @@ public class AppointmentResource {
 			return Response.status(400).entity("Missing parameters...").build();
 		}
 	}
-	
-	/**
-	 * Method to format date received from client.
-	 * @param dateTime
-	 * @return
-	 * @throws ParseException
-	 */
-	private Date formatToDate(String dateTime) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date date = sdf.parse(dateTime);
-		return date;
-	}
-	
-	
-	
-
 }

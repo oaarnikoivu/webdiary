@@ -10,7 +10,7 @@ public class Appointment {
 	
 	public String appointmentId; 
 	
-	public long dateAndTime; 
+	public long dateAndTime;
 	
 	public double duration;
 	
@@ -79,11 +79,8 @@ public class Appointment {
 
 	@Override
 	public String toString() {
-		return "Appointment [appointmentId=" + appointmentId + ", dateAndTime=" + dateAndTime + ", duration=" + duration
-				+ ", owner=" + owner + ", description=" + description + "]";
+		return "Appointment [appointmentId=" + appointmentId + ", dateAndTime=" + dateAndTime + ", duration=" + duration + ", owner="
+				+ owner + ", description=" + description + "]";
 	}
-	
-	
-	
 	
 }
