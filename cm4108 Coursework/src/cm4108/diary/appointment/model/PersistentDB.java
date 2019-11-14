@@ -68,7 +68,14 @@ public class PersistentDB implements AppointmentDatabase {
 	}
 
 	@Override
-	public void addAppointment(Appointment appointment) {
+	public void addAppointment(Appointment a) {
+		Appointment appointment = new Appointment();
+		
+		appointment.setDateAndTime(a.getDateAndTime());
+		appointment.setDuration(a.getDuration());
+		appointment.setOwner(a.getOwner());
+		appointment.setDescription(a.getDescription());
+		
 		PersistentDB.dynamoDBMapper.save(appointment);
 	}
 

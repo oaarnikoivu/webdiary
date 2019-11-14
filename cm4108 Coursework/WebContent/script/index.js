@@ -1,4 +1,5 @@
 const baseURL="api";
+let appointmentId = "1";
 
 //the document ready function
 try	{
@@ -17,28 +18,32 @@ try	{
  */
 function init() {
 	
-	$('#addAppointmentPopup').dialog({
+	$('#appointmentDialog').dialog({
 		modal:true,
 		autoOpen: false,
-		title: 'Add Appointment',
 		minWidth: 500,
 		minHeight: 280
 	});
 	
 	// add appointment click handler 
 	$('#addAppointment').click(function() {
-		
+			
 		// clear any appointment input values
 		clearAppointmentInput();
 		
 		// open dialog
-		$('#addAppointmentPopup').dialog('open', true);
+		$('#appointmentDialog').dialog('open', true);
+		$('#appointmentDialog').dialog({title: 'Add Appointment'});
+		
+		$('#saveAppointment').show();
+		$('#updateAppointment').hide();
 	});
 	
 	// show appointment(s) click hander
 	$('#showAppointment').click(function() {
-		// hide appointment pop up
-		$('#addAppointmentPopup').dialog('close');
+		
+		// hide appointment pop up if open
+		$('#appointmentDialog').dialog('close');
 		
 		var owner = $('#user').val();
 		var fromDate = formatToDate($('#fromDatepicker').val());
@@ -69,55 +74,43 @@ function init() {
 		});
 	})
 	
+	// save appointment on save clicked
 	$("#saveAppointment").click(function() {
 		saveAppointment();
-	})
+	});
 	
-	// hide appointment on cancel clicked
+	// handle update appointment clicked 
+	$('#updateAppointment').click(function() {
+		updateAppointment(appointmentId);
+	});
+	
+	// hide appointment popup on cancel clicked
 	$("#cancelAppointment").click(function() {
-		$('#addAppointmentPopup').dialog('close');
+		$('#appointmentDialog').dialog('close');
 	});
 }
 
 /**
- * 
+ * Function to add a new appointment
  * @returns
  */
-function saveAppointment() {
-	
-	var owner = $('#owner').val();
-	var description = $('#description').val();
-	
-	var date = $('#addAppointmentDatepicker').val();	
-	var time = $('#timepicker').val();
-	
-	time = time.replace('AM', '');
-	time = time.replace('PM', '');
-	
-	var day = date.split('-')[2];
-	var month = date.split('-')[1] - 1;
-	var year = date.split('-')[0];
-	
-	var hours = time.substr(0, time.indexOf(':'));
-	var minutes = time.split(':').pop();
-	
-	var d = new Date(year, month, day, hours, minutes);
-	
-	var duration = $('#duration').val();
-	
-	var url = baseURL + '/appointment';
-	
-	var data = {
-			"owner": owner,
-			"description": description,
-			"date": d.getTime(),
-			"duration": duration
-	};
+function saveAppointment() {	
+	const url = baseURL + '/appointment';
 	
 	// use jQuery shorthand Ajax POST function
-	$.post(url, data, function() {
-		alert("Appointment saved.");
-	})
+	$.ajax({
+		type: 'POST',
+		url: url,
+		contentType: 'application/json',
+		data: formToJSON(),
+		success: function(data, status, xhr) {
+			alert(xhr.responseText); // success message received from back-end
+		},
+		error: function(xhr, status, error) {
+			alert('saveAppointment error: ' + error);
+			console.log(xhr.responseText)
+		}
+	});
 }
 
 /**
@@ -127,8 +120,9 @@ function saveAppointment() {
 function clearAppointmentInput() {
 	$('#description').val("");
 	$('#addAppointmentDatepicker').val("");
-	$('#startTime').val("");
+	$('#timepicker').val("");
 	$('#duration').val("");
+	$('#owner').val("");
 }
 
 /**
@@ -143,7 +137,7 @@ function retrieveAppointments(owner, fromDate, toDate) {
 	
 	// use jQuery shorthand Ajax function to get JSON data
 	$.getJSON(url, function(appointments) {
-		$('#appointments').empty();
+		$('#appointments').empty(); // empty any existing appointment values 
 		
 		appointments.forEach(a => {
 			var id = a['appointmentId']; // get appointment ID from JSON data
@@ -168,9 +162,88 @@ function retrieveAppointments(owner, fromDate, toDate) {
 		
 			// compose HTML list using appointment ID, date, time and description
 			var htmlCode = "<li id='"+id+"'>"+date+" "+time+" "+description+"</li>";
+			
 			$('#appointments').append(htmlCode); // add a child to the appointment list 
-		})
-	})
+			
+			$('#appointments li').click(function() {
+				appointmentClicked($(this).attr('id'));
+			});
+		});
+	});
+}
+
+/**
+ * Function to handle when an appointment is clicked
+ * @param id
+ * @returns
+ */
+function appointmentClicked(id) {
+	const url = baseURL + '/appointment/' + id;
+	
+	appointmentId = id;
+
+	$('#appointments li').removeClass('selected');
+	
+	$('#'+id).addClass('selected');
+	
+	// clear existing appointment dialog values 
+	clearAppointmentInput();
+	
+	// open dialog
+	$('#appointmentDialog').dialog('open', true);
+	$('#appointmentDialog').dialog({title: 'Update Appointment'});
+	
+	$('#saveAppointment').hide();
+	$('#updateAppointment').show();
+	
+		
+	// retrieve appointment data for user given by id
+	$.getJSON(url, function(jsonData) {
+		var owner = jsonData['owner'];
+		var description = jsonData['description'];
+		var date = new Date(jsonData['dateAndTime']);
+		var duration = jsonData['duration'];
+		
+		var hours = date.getHours();
+		var minutes = ('0' + date.getMinutes()).slice(-2); // set to 2 decimal places 
+		var startTime = hours + ":" + minutes;
+		
+		// Append AM or PM to start time depending on the received value for dateAndTime 
+		hours > 11 ? startTime += " PM" : startTime += " AM";
+		
+		// replace dash with slash for date value
+		date = replaceAll(date.toLocaleDateString(), '/', '-');
+		
+		// set values to retrieved values 
+		$('#owner').val(owner);
+		$('#description').val(description);
+		$('#addAppointmentDatepicker').val(date);
+		$('#timepicker').val(startTime);
+		$('#duration').val(duration);
+	});
+}
+
+/**
+ * Function for updating an appointment given its id 
+ * @param id
+ * @returns
+ */
+function updateAppointment(id) {
+	const url = baseURL + "/appointment/" + id;
+	
+	$.ajax({
+		type: 'PUT',
+		url: url,
+		contentType: 'application/json',
+		data: formToJSON(),
+		success: function(data, textStatus, xhr) {
+			alert(xhr.responseText);
+		},
+		error: function(xhr, textStatus, errorThrown) {
+			alert('updateAppointment error: ' + textStatus);
+			console.log(xhr.responseText);
+		}
+	});
 }
 
 /**
@@ -229,5 +302,35 @@ function calculateTotalTime(hours, minutes, duration) {
 	
 	return time;
 }
+
+/**
+ * Function to convert form values to JSON object 
+ * @returns
+ */
+function formToJSON() {
+	
+	var date = $('#addAppointmentDatepicker').val();
+	var startTime = $('#timepicker').val();
+	
+	startTime = startTime.replace('AM', '');
+	startTime = startTime.replace('PM', '');
+		
+	var day = date.split('-')[2];
+	var month = date.split('-')[1] - 1;
+	var year = date.split('-')[0];
+	
+	var hours = startTime.substr(0, startTime.indexOf(':'));
+	var minutes = startTime.split(':').pop();
+	
+	var d = new Date(year, month, day, hours, minutes);
+	
+	return JSON.stringify({
+		"owner": $('#owner').val(),
+		"description": $('#description').val(),
+		"dateAndTime": d.getTime(),
+		"duration": $('#duration').val()
+	});
+}
+
 
 

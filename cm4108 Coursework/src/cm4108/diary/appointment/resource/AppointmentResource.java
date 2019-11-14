@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -35,22 +34,10 @@ public class AppointmentResource {
 	 */
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response addAppointment(
-			@FormParam("date") long date,
-			@FormParam("duration") String duration,
-			@FormParam("description") String description,
-			@FormParam("owner") String owner) {
+	public Response addAppointment(Appointment appointment) {
 		try {
-					
-			Appointment appointment = new Appointment();
-			
-			appointment.setDateAndTime(date);
-			appointment.setDuration(Double.valueOf(duration));
-			appointment.setDescription(description);
-			appointment.setOwner(owner);
-			
 			AppointmentResource.database.addAppointment(appointment);
-			return Response.status(201).entity("Appointment saved.").build();
+			return Response.status(201).entity("Appointment successfully added").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(500).entity("Adding a new appointment has failed.").build();
@@ -63,8 +50,8 @@ public class AppointmentResource {
 	 * @return
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{appointmentId}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Appointment retrieveAppointment(@PathParam("appointmentId") String appointmentId) {
 		Appointment appointment = AppointmentResource.database.findAppointmentById(appointmentId);
 		return appointment;
@@ -78,8 +65,8 @@ public class AppointmentResource {
 	 * @throws ParseException
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{owner}/{fromDate}/{toDate}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<Appointment> retrieveAppointmentsFromDates(
 			@PathParam("owner") String owner,
 			@PathParam("fromDate") long fromDate, 
