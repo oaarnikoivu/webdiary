@@ -2,10 +2,12 @@ package cm4108.diary.appointment.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
@@ -92,19 +94,27 @@ public class PersistentDB implements AppointmentDatabase {
 	}
 
 	@Override
-	public List<Appointment> findAppointmentsBetweenDates(long fromDate, long toDate) {
+	public List<Appointment> findAppointmentsBetweenDates(String owner, long fromDate, long toDate) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 			
 		eav.put(":date1", new AttributeValue().withN (String.valueOf(fromDate)));
 		eav.put(":date2", new AttributeValue().withN(String.valueOf(toDate)));
 		
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-				.withFilterExpression("dateAndTime >= :date1 and dateAndTime <= :date2")
+				.withFilterExpression("dateAndTime between :date1 and :date2")
 				.withExpressionAttributeValues(eav);
 		
-		List<Appointment> result = PersistentDB.dynamoDBMapper.scan(Appointment.class, scanExpression);
+		List<Appointment> appointments = new ArrayList<>();
+			
+		List<Appointment> result = PersistentDB.dynamoDBMapper
+				.scan(Appointment.class, scanExpression)
+				.stream().filter(a -> a.getOwner().equals(owner))
+				.collect(Collectors.toList());
+				
+		result.forEach(a -> appointments
+				.add(PersistentDB.dynamoDBMapper.load(Appointment.class, a.getAppointmentId())));
 		
-		return result;
+		return appointments;
 	}
 
 }

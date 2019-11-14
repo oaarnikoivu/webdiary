@@ -49,7 +49,6 @@ public class AppointmentResource {
 			appointment.setDescription(description);
 			appointment.setOwner(owner);
 			
-			
 			AppointmentResource.database.addAppointment(appointment);
 			return Response.status(201).entity("Appointment saved.").build();
 		} catch (Exception e) {
@@ -87,7 +86,7 @@ public class AppointmentResource {
 			@PathParam("toDate") long toDate) throws ParseException {
 			
 		List<Appointment> appointments = AppointmentResource
-				.database.findAppointmentsBetweenDates(fromDate, toDate);
+				.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
 		
 		return appointments;
 		

@@ -5,7 +5,7 @@ import java.util.List;
 public interface AppointmentDatabase {
 	
 	public Appointment findAppointmentById(String id);
-	public List<Appointment> findAppointmentsBetweenDates(long fromDate, long toDate);
+	public List<Appointment> findAppointmentsBetweenDates(String owner, long fromDate, long toDate);
 	public void addAppointment(Appointment appointment);
 	public void deleteAppointmentById(String id);
 	public void updateAppointmentById(String id, Appointment appointment);
