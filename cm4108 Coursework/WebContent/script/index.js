@@ -37,6 +37,7 @@ function init() {
 		
 		$('#saveAppointment').show();
 		$('#updateAppointment').hide();
+		$('#deleteAppointment').hide();
 	});
 	
 	// show appointment(s) click hander
@@ -45,9 +46,9 @@ function init() {
 		// hide appointment pop up if open
 		$('#appointmentDialog').dialog('close');
 		
-		var owner = $('#user').val();
-		var fromDate = formatToDate($('#fromDatepicker').val());
-		var toDate = formatToDate($('#toDatepicker').val());
+		var owner = $('#user').val().replace(/\s/g, '');
+		var fromDate = formatToDate($('#fromDatepicker').val().replace(/\s/g, ''));
+		var toDate = formatToDate($('#toDatepicker').val().replace(/\s/g, ''));
 		
 		//retrieve appointments
 		retrieveAppointments(owner, fromDate.getTime(), toDate.getTime());
@@ -83,6 +84,11 @@ function init() {
 	$('#updateAppointment').click(function() {
 		updateAppointment(appointmentId);
 	});
+	
+	$('#deleteAppointment').click(function() {
+		deleteAppointment(appointmentId);
+		$('#appointmentDialog').dialog('close');
+	})
 	
 	// hide appointment popup on cancel clicked
 	$("#cancelAppointment").click(function() {
@@ -195,6 +201,7 @@ function appointmentClicked(id) {
 	
 	$('#saveAppointment').hide();
 	$('#updateAppointment').show();
+	$('#deleteAppointment').show();
 	
 		
 	// retrieve appointment data for user given by id
@@ -217,7 +224,7 @@ function appointmentClicked(id) {
 		// set values to retrieved values 
 		$('#owner').val(owner);
 		$('#description').val(description);
-		$('#addAppointmentDatepicker').val(date);
+		$('#addAppointmentDatepicker').val(date);	
 		$('#timepicker').val(startTime);
 		$('#duration').val(duration);
 	});
@@ -244,6 +251,27 @@ function updateAppointment(id) {
 			console.log(xhr.responseText);
 		}
 	});
+}
+
+/**
+ * Function to delete an appointment given by its ID 
+ * @param id
+ * @returns
+ */
+function deleteAppointment(id) {
+	const url = baseURL + "/appointment/" + id;
+	
+	$.ajax({
+		type: 'DELETE',
+		url: url,
+		success: function(data, textStatus, xhr) {
+			alert(xhr.responseText);
+		},
+		error: function(xhr, textStatus, errorThrown) {
+			alert('deleteAppointment error: ' + textStatus);
+			console.log(xhr.responseText);
+		}
+	})
 }
 
 /**
@@ -324,11 +352,12 @@ function formToJSON() {
 	
 	var d = new Date(year, month, day, hours, minutes);
 	
+	// return a JSON object and remove any unnecessary whitespace 
 	return JSON.stringify({
-		"owner": $('#owner').val(),
-		"description": $('#description').val(),
+		"owner": $('#owner').val().replace(/\s/g, ''),
+		"description": $('#description').val().replace(/\s/g, ''),
 		"dateAndTime": d.getTime(),
-		"duration": $('#duration').val()
+		"duration": $('#duration').val().replace(/\s/g, '')
 	});
 }
 
