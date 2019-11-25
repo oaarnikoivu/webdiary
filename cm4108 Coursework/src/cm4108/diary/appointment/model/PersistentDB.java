@@ -1,13 +1,9 @@
 package cm4108.diary.appointment.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
@@ -30,6 +26,10 @@ public class PersistentDB implements AppointmentDatabase {
 		
 	}
 	
+	/**
+	 * Create a new DynamoDB instance
+	 * @return
+	 */
 	public static PersistentDB getInstance() {
 		if (PersistentDB.instance == null) {
 			PersistentDB.instance = new PersistentDB();
@@ -38,26 +38,6 @@ public class PersistentDB implements AppointmentDatabase {
 			CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(Appointment.class);
 			createTableRequest.withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 			DynamoDBUtil.getDynamoDBClient(PersistentDB.REGION, PersistentDB.LOCAL_ENDPOINT).createTable(createTableRequest);
-			
-			Appointment testAppointment = new Appointment();
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-			
-			try {
-				Date date = sdf.parse("2019-09-29 13:00:00");
-				
-				testAppointment.setAppointmentId("1");
-				testAppointment.setDateAndTime(date.getTime());
-				testAppointment.setDuration(60);
-				testAppointment.setOwner("Jeff Jeff");
-				testAppointment.setDescription("Testing description");
-				
-				PersistentDB.dynamoDBMapper.save(testAppointment);
-				
-				System.out.println("SAVED HASH KEY VALUE: " + testAppointment.getAppointmentId());
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
 		}
 		return PersistentDB.instance;
 	}
@@ -69,13 +49,12 @@ public class PersistentDB implements AppointmentDatabase {
 
 	@Override
 	public void addAppointment(Appointment a) {
-		Appointment appointment = new Appointment();
-		
-		appointment.setDateAndTime(a.getDateAndTime());
-		appointment.setDuration(a.getDuration());
-		appointment.setOwner(a.getOwner());
-		appointment.setDescription(a.getDescription());
-		
+		Appointment appointment = new Appointment(
+				a.getDateAndTime(), 
+				a.getDuration(), 
+				a.getOwner(), 
+				a.getDescription());
+			
 		PersistentDB.dynamoDBMapper.save(appointment);
 	}
 
@@ -101,27 +80,26 @@ public class PersistentDB implements AppointmentDatabase {
 	}
 
 	@Override
-	public List<Appointment> findAppointmentsBetweenDates(String owner, long fromDate, long toDate) {
+	public Collection<Appointment> findAppointmentsBetweenDates(String owner, long fromDate, long toDate) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-			
+		
+		eav.put(":owner", new AttributeValue().withS(owner));
 		eav.put(":date1", new AttributeValue().withN (String.valueOf(fromDate)));
 		eav.put(":date2", new AttributeValue().withN(String.valueOf(toDate)));
-		
+			
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-				.withFilterExpression("dateAndTime between :date1 and :date2")
+				.withFilterExpression("#o = :owner and dateAndTime between :date1 and :date2")
 				.withExpressionAttributeValues(eav);
 		
-		List<Appointment> appointments = new ArrayList<>();
-			
-		List<Appointment> result = PersistentDB.dynamoDBMapper
-				.scan(Appointment.class, scanExpression)
-				.stream().filter(a -> a.getOwner().equals(owner))
-				.collect(Collectors.toList());
-				
-		result.forEach(a -> appointments
-				.add(PersistentDB.dynamoDBMapper.load(Appointment.class, a.getAppointmentId())));
+		Map<String, String> expression = new HashMap<>();
+
+        expression.put("#o", "owner");
+        
+        scanExpression.withExpressionAttributeNames(expression);
+		
+		List<Appointment> appointments = PersistentDB.dynamoDBMapper.scan(Appointment.class, scanExpression);
 		
 		return appointments;
+			
 	}
-
 }

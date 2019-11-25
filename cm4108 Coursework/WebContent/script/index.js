@@ -355,7 +355,7 @@ function formToJSON() {
 	// return a JSON object and remove any unnecessary whitespace 
 	return JSON.stringify({
 		"owner": $('#owner').val().replace(/\s/g, ''),
-		"description": $('#description').val().replace(/\s/g, ''),
+		"description": $('#description').val(),
 		"dateAndTime": d.getTime(),
 		"duration": $('#duration').val().replace(/\s/g, '')
 	});

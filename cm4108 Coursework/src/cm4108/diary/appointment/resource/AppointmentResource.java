@@ -1,8 +1,7 @@
 package cm4108.diary.appointment.resource;
 
 import java.text.ParseException;
-
-import java.util.List;
+import java.util.Collection;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -12,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -54,7 +54,9 @@ public class AppointmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Appointment retrieveAppointment(@PathParam("appointmentId") String appointmentId) {
 		Appointment appointment = AppointmentResource.database.findAppointmentById(appointmentId);
-		return appointment;
+		if (appointment != null)
+			return appointment;
+		throw new WebApplicationException(401);
 	}
 	
 	/**
@@ -65,17 +67,15 @@ public class AppointmentResource {
 	 * @throws ParseException
 	 */
 	@GET
-	@Path("{owner}/{fromDate}/{toDate}")
+	@Path("{owner}/{fromDate}&{toDate}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Appointment> retrieveAppointmentsFromDates(
+	public Collection<Appointment> retrieveAppointmentsFromDates(
 			@PathParam("owner") String owner,
 			@PathParam("fromDate") long fromDate, 
 			@PathParam("toDate") long toDate) throws ParseException {
-			
-		List<Appointment> appointments = AppointmentResource
-				.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
 		
-		return appointments;
+		return AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
+		
 		
 	}
 	

@@ -22,8 +22,7 @@ public class Appointment {
 		
 	}
 	
-	public Appointment(String appointmentId, long dateAndTime, int duration, String owner, String description) {
-		this.setAppointmentId(appointmentId);
+	public Appointment(long dateAndTime, int duration, String owner, String description) {
 		this.setDateAndTime(dateAndTime);
 		this.setDuration(duration);
 		this.setOwner(owner);
@@ -41,7 +40,6 @@ public class Appointment {
 		this.appointmentId = appointmentId;
 	}
 
-	@DynamoDBAttribute(attributeName="dateAndTime")
 	public long getDateAndTime() {
 		return dateAndTime;
 	}
