@@ -37,11 +37,18 @@ public class PersistentDB implements AppointmentDatabase {
 			PersistentDB.instance = new PersistentDB();
 			PersistentDB.dynamoDBMapper = DynamoDBUtil.getDBMapper(PersistentDB.REGION, PersistentDB.LOCAL_ENDPOINT);
 			
+			// Create a table request
 			CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(Appointment.class);
+			
+			// Set the amount of read and write activity that the table can support 
 			final ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(5L, 5L);
 			createTableRequest.setProvisionedThroughput(provisionedThroughput);
 			createTableRequest.getGlobalSecondaryIndexes().forEach(v -> v.setProvisionedThroughput(provisionedThroughput));
+			
+			// Allow the global secondary index to query all attributes in the table 
 			createTableRequest.getGlobalSecondaryIndexes().forEach(v -> v.setProjection(new Projection().withProjectionType(ProjectionType.ALL)));
+			
+			// Create the table
 			DynamoDBUtil.getDynamoDBClient(PersistentDB.REGION, PersistentDB.LOCAL_ENDPOINT).createTable(createTableRequest);
 		}
 		return PersistentDB.instance;

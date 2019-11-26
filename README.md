@@ -21,6 +21,30 @@ The duration field has been mapped with the simple *DynamoDBAttribute* annotatio
 ![duration](report/../report-images/duration.png)
 
 #### Owner
-As was briefly mentioned when discussing the *dateAndTime* attribute, the GSI was made use of to refine results using the index sort key. 
+As was briefly mentioned when discussing the *dateAndTime* attribute, the GSI was made use of to refine results using the index sort key. Thus, using the index hash key for the owner maps 
 
 ![owner](report/../report-images/owner.png)
+
+#### Description 
+Similar to the duration field, the description has also been mapped with a *DynamoDBAttribute* annotation simply mapping the property to a table attribute.
+
+![description](report-images/description.png)
+
+## Web Services
+
+### AppointmentDatabase 
+The *AppointmentDatabase* is an interface which consists of all the required operations. In particular, I've provided methods for finding an appointment given by its ID, for finding appointments for a specific owner between two specified dates, for adding a new appointment, deleting an appointment given its ID and for updating an appointment given its ID and new attribute values. 
+
+![appointmentDB](report-images/appointmentDB.png)
+
+### PersistentDB
+The *PersistentDB* class implements the *AppointmentDatabase* interface in order to handle all the necessary logic for each database operation. In addition, the *PersistentDB* class consists of all the required configurations for generating a new instance of a DynamoDB table. I've configured the DynamoDB table name as *cm4108-coursework*, the region to local, and the local endpoint to port 8000. 
+
+#### Creating a new instance
+As shown by the image below, I've decided to create a new DynamoDB table programmatically. First, we determine if the current database instance is null. If this is the case, a new instance is created using the *generateCreateTableRequest* function provided by the *DynamoDBMapper* class. Next, we set the amount of read and write activity that the table can support. It's important to note that a global secondary index has no size limitations and has its own provisioned throughput settings for read and write activity which are separate from the table. Therefore, the values for the provisioned throughout need to be set separately. 
+
+```java
+createTableRequest.getGlobalSecondaryIndexes.forEach(v -> v.setProvisionedThroughput(provisionedThroughput)
+```
+
+![db-instance](report-images/db-instance.png)
