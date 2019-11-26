@@ -2,6 +2,7 @@ package cm4108.diary.appointment.resource;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -11,10 +12,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import cm4108.diary.appointment.exception.AppointmentNotFoundException;
+import cm4108.diary.appointment.exception.AppointmentsNotFoundException;
 import cm4108.diary.appointment.model.Appointment;
 import cm4108.diary.appointment.model.AppointmentDatabase;
 import cm4108.diary.appointment.model.PersistentDB;
@@ -40,7 +42,9 @@ public class AppointmentResource {
 			return Response.status(201).entity("Appointment successfully added").build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(500).entity("Adding a new appointment has failed.").build();
+			return Response.status(400)
+					.entity("Something went wrong. Params accepted: owner, description, dateAndTime, duration")
+					.build();
 		}
 	}
 
@@ -56,27 +60,30 @@ public class AppointmentResource {
 		Appointment appointment = AppointmentResource.database.findAppointmentById(appointmentId);
 		if (appointment != null)
 			return appointment;
-		throw new WebApplicationException(401);
+		throw new AppointmentNotFoundException(appointmentId);
 	}
 	
 	/**
-	 * Retrieve appointments between two specified dates
+	 * Retrieve appointments between two specified dates for a specific user 
 	 * @param fromDate
 	 * @param toDate
 	 * @return
 	 * @throws ParseException
 	 */
 	@GET
-	@Path("{owner}/{fromDate}&{toDate}")
+	@Path("{owner}/{fromDate}/{toDate}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Appointment> retrieveAppointmentsFromDates(
 			@PathParam("owner") String owner,
 			@PathParam("fromDate") long fromDate, 
 			@PathParam("toDate") long toDate) throws ParseException {
 		
-		return AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
+		List<Appointment> appointments = 
+				(List<Appointment>) AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
 		
-		
+		if (appointments != null) 
+			return appointments;
+		throw new AppointmentsNotFoundException(owner);
 	}
 	
 	/**
@@ -93,7 +100,7 @@ public class AppointmentResource {
 			return Response.status(200).entity("Appointment successfully removed.").build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(500).entity("Deleting appointment has failed.").build();
+			return Response.status(500).entity("Removing the appointment has failed.").build();
 		}
 	}
 	

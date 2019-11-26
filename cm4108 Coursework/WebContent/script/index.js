@@ -1,5 +1,6 @@
 const baseURL="api";
 let appointmentId = "1";
+var oldDate; 
 
 //the document ready function
 try	{
@@ -146,11 +147,14 @@ function retrieveAppointments(owner, fromDate, toDate) {
 		$('#appointments').empty(); // empty any existing appointment values 
 		
 		appointments.forEach(a => {
+			console.log(a);
 			var id = a['appointmentId']; // get appointment ID from JSON data
 			var owner = a['owner']; // get appointment owner from JSON data
 			var dateTime = a['dateAndTime']; // get appointment date and timestamp from JSON data
 			var description = a['description']; // get appointment description from JSON data
 			var duration = a['duration']; // get appointment duration from JSON data
+			
+			console.log(description);
 			
 			// convert long date and timestamp to a JS date object
 			var date = new Date(dateTime);
@@ -162,7 +166,7 @@ function retrieveAppointments(owner, fromDate, toDate) {
 			var minutes = ('0' + date.getMinutes()).slice(-2); // set to 2 decimal places
 			
 			date = replaceAll(date.toLocaleDateString(), '/', '-'); // convert dash to slash 
-			
+		
 			// receive starting and end time of appointment
 			var time = calculateTotalTime(hours, minutes, duration);
 		
@@ -186,6 +190,7 @@ function retrieveAppointments(owner, fromDate, toDate) {
 function appointmentClicked(id) {
 	const url = baseURL + '/appointment/' + id;
 	
+	// set the global appointment id so that it can be used when updating 
 	appointmentId = id;
 
 	$('#appointments li').removeClass('selected');
@@ -221,6 +226,8 @@ function appointmentClicked(id) {
 		// replace dash with slash for date value
 		date = replaceAll(date.toLocaleDateString(), '/', '-');
 		
+		oldDate = date;
+			
 		// set values to retrieved values 
 		$('#owner').val(owner);
 		$('#description').val(description);
@@ -336,20 +343,26 @@ function calculateTotalTime(hours, minutes, duration) {
  * @returns
  */
 function formToJSON() {
-	
 	var date = $('#addAppointmentDatepicker').val();
 	var startTime = $('#timepicker').val();
 	
 	startTime = startTime.replace('AM', '');
 	startTime = startTime.replace('PM', '');
-		
-	var day = date.split('-')[2];
-	var month = date.split('-')[1] - 1;
-	var year = date.split('-')[0];
+	
+	// Handle date formating 
+	if (date != oldDate) {
+		var day = date.split('-')[2];
+		var month = date.split('-')[1] - 1;
+		var year = date.split('-')[0];
+	} else {
+		var day = date.split('-')[0];
+		var month = date.split('-')[1] - 1;
+		var year = date.split('-')[2];
+	}
 	
 	var hours = startTime.substr(0, startTime.indexOf(':'));
 	var minutes = startTime.split(':').pop();
-	
+		
 	var d = new Date(year, month, day, hours, minutes);
 	
 	// return a JSON object and remove any unnecessary whitespace 
