@@ -21,7 +21,7 @@ The duration field has been mapped with the simple *DynamoDBAttribute* annotatio
 ![duration](report/../report-images/duration.png)
 
 #### Owner
-As was briefly mentioned when discussing the *dateAndTime* attribute, the GSI was made use of to refine results using the index sort key. Thus, using the index hash key for the owner maps 
+As was briefly mentioned when discussing the *dateAndTime* attribute, the GSI was made use of to refine results using the index sort key. Thus, using the index hash key for the owner maps...
 
 ![owner](report/../report-images/owner.png)
 
@@ -41,10 +41,44 @@ The *AppointmentDatabase* is an interface which consists of all the required ope
 The *PersistentDB* class implements the *AppointmentDatabase* interface in order to handle all the necessary logic for each database operation. In addition, the *PersistentDB* class consists of all the required configurations for generating a new instance of a DynamoDB table. I've configured the DynamoDB table name as *cm4108-coursework*, the region to local, and the local endpoint to port 8000. 
 
 #### Creating a new instance
-As shown by the image below, I've decided to create a new DynamoDB table programmatically. First, we determine if the current database instance is null. If this is the case, a new instance is created using the *generateCreateTableRequest* function provided by the *DynamoDBMapper* class. Next, we set the amount of read and write activity that the table can support. It's important to note that a global secondary index has no size limitations and has its own provisioned throughput settings for read and write activity which are separate from the table. Therefore, the values for the provisioned throughout need to be set separately. 
+As shown by the image below, I've decided to create a new DynamoDB table programmatically. First, we determine if the current database instance is null. If this is the case, a new instance is created using the *generateCreateTableRequest* function provided by the *DynamoDBMapper* class. Next, we set the amount of read and write activity that the table can support. It's important to note that a global secondary index has no size limitations and has its own provisioned throughput settings for read and write activity which are separate from the table. Therefore, the values for the provisioned throughput need to be set separately. This is being done using the snippet of code shown below.
 
 ```java
-createTableRequest.getGlobalSecondaryIndexes.forEach(v -> v.setProvisionedThroughput(provisionedThroughput)
+createTableRequest.getGlobalSecondaryIndexes.forEach(v -> v.setProvisionedThroughput(provisionedThroughput);
+```
+
+Furthermore, we need to allow the global secondary index to query all the attributes in the table. By default, the projection type is set to *KEYS_ONLY* which ensures that only the index and primary keys are projected into the index. Whereas, when using the projection type *ALL*, we are ensuring that all of the table attributes are being projected. This is being done using the following snippet of code. 
+
+```java
+createTableRequest.getGlobalSecondaryIndexes().forEach(v -> v.setProjection(new Projection().withProjectionType(ProjectionType.ALL)));
 ```
 
 ![db-instance](report-images/db-instance.png)
+
+#### Finding an appointment given its ID
+In order to retrieve an appointment by its ID, I simply make use of the *load* function provided by the *DynamoDBMapper* where I pass in the appointment class as well as the partition/hash key of the appointment. 
+
+![find](report-images/findapt.png)
+
+#### Adding an appointment 
+In order to add an appointment, I define a new appointment object and pass in the form-filled parameters. I then use the mapper to persist the appointment object. 
+
+![add](report-images/addapt.png)
+
+#### Deleting an appointment
+To delete an appointment, I first load the load the appointment object using the partition/hash key. I then check if the object exists, and if this is the case the appointment is simply deleted using the mapper *delete* function. 
+
+![delete](report-images/delete.png)
+
+#### Updating an appointment 
+To update an appointment, I first load the appointment object using the partition/hash key. Next, I check if the appointment to update exists. If it does, then the loaded appointment is updated with the client side form-filled parameters. 
+
+![update](report-images/update.png)
+
+#### Retrieving appointments between two dates
+In order to retrieve appointments between two dates for a specific user, I first define a new HashMap for storing the expression attribute values. Using a *DynamoDBQueryExpression*, I then query the index to retrieve a subset of appointments for the specified owner between the 2 long values for dates. It's essential to specify the index name so that DynamoDB knows which index to query. Thus, I specify the index name as *OwnerIndex* as this is the global secondary index name I decided to make use of for both the index hash key and index range key as discussed above. 
+
+The retrieval of appointments between two dates for a specific owner can also be done using a *DynamoDBScanExpression*, however, scanning works through the whole table and can be quite expensive if the table is big. Querying, on the other hand, works by searching on key and is therefore more efficient. Evidently, for a simple application such as a personal diary, you most likely do not need to take into account the use of a query expression as your database likely won't contain hundreds of entries, thus, the querying here has just been provided for demonstration. I've also included a function for scanning the appointments as opposed to querying, thus, either option can be made use of. Both the querying and scanning functions are shown below. 
+
+![query](report-images/query.png)
+![scan](report-images/scan.png)

@@ -78,8 +78,11 @@ public class AppointmentResource {
 			@PathParam("fromDate") long fromDate, 
 			@PathParam("toDate") long toDate) throws ParseException {
 		
-		List<Appointment> appointments = 
-				(List<Appointment>) AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate);
+		// Uncomment to use DynamoDB query expression instead 
+		/*List<Appointment> appointments = 
+				(List<Appointment>) AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate); */
+		
+		List<Appointment> appointments = (List<Appointment>) AppointmentResource.database.scanAppointmentsBetweenDates(owner, fromDate, toDate);
 		
 		if (appointments != null) 
 			return appointments;
