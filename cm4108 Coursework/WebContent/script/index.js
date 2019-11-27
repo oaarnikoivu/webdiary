@@ -147,15 +147,12 @@ function retrieveAppointments(owner, fromDate, toDate) {
 		$('#appointments').empty(); // empty any existing appointment values 
 		
 		appointments.forEach(a => {
-			console.log(a);
 			var id = a['appointmentId']; // get appointment ID from JSON data
 			var owner = a['owner']; // get appointment owner from JSON data
 			var dateTime = a['dateAndTime']; // get appointment date and timestamp from JSON data
 			var description = a['description']; // get appointment description from JSON data
 			var duration = a['duration']; // get appointment duration from JSON data
-			
-			console.log(description);
-			
+				
 			// convert long date and timestamp to a JS date object
 			var date = new Date(dateTime);
 			

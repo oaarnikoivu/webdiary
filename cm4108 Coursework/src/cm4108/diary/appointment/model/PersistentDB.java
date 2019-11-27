@@ -125,7 +125,7 @@ public class PersistentDB implements AppointmentDatabase {
 				.withKeyConditionExpression("#o = :owner and dateAndTime between :date1 and :date2")
 				.withExpressionAttributeValues(eav);
 		
-		// Handle reserved keyword owner
+		// Handle reserved keyword 'owner'
 		Map<String, String> expression = new HashMap<>();
         expression.put("#o", "owner");    
         queryExpression.withExpressionAttributeNames(expression);
@@ -157,6 +157,7 @@ public class PersistentDB implements AppointmentDatabase {
 				.withFilterExpression("#o = :owner and dateAndTime between :date1 and :date2")
 				.withExpressionAttributeValues(eav);
 		
+		// Handle reserved keyword 'owner'
 		Map<String, String> expression = new HashMap<>();
         expression.put("#o", "owner");    
         scanExpression.withExpressionAttributeNames(expression);

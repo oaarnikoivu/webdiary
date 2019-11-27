@@ -79,10 +79,11 @@ public class AppointmentResource {
 			@PathParam("toDate") long toDate) throws ParseException {
 		
 		// Uncomment to use DynamoDB query expression instead 
-		/*List<Appointment> appointments = 
-				(List<Appointment>) AppointmentResource.database.findAppointmentsBetweenDates(owner, fromDate, toDate); */
+		/* List<Appointment> appointments = (List<Appointment>) 
+				AppointmentResource.database.queryAppointmentsBetweenDates(owner, fromDate, toDate); */
 		
-		List<Appointment> appointments = (List<Appointment>) AppointmentResource.database.scanAppointmentsBetweenDates(owner, fromDate, toDate);
+		List<Appointment> appointments = (List<Appointment>) 
+				AppointmentResource.database.scanAppointmentsBetweenDates(owner, fromDate, toDate);
 		
 		if (appointments != null) 
 			return appointments;
@@ -127,4 +128,6 @@ public class AppointmentResource {
 			return Response.status(400).entity("Missing parameters...").build();
 		}
 	}
+	
+	
 }

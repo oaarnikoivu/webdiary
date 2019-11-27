@@ -78,7 +78,78 @@ To update an appointment, I first load the appointment object using the partitio
 #### Retrieving appointments between two dates
 In order to retrieve appointments between two dates for a specific user, I first define a new HashMap for storing the expression attribute values. Using a *DynamoDBQueryExpression*, I then query the index to retrieve a subset of appointments for the specified owner between the 2 long values for dates. It's essential to specify the index name so that DynamoDB knows which index to query. Thus, I specify the index name as *OwnerIndex* as this is the global secondary index name I decided to make use of for both the index hash key and index range key as discussed above. 
 
-The retrieval of appointments between two dates for a specific owner can also be done using a *DynamoDBScanExpression*, however, scanning works through the whole table and can be quite expensive if the table is big. Querying, on the other hand, works by searching on key and is therefore more efficient. Evidently, for a simple application such as a personal diary, you most likely do not need to take into account the use of a query expression as your database likely won't contain hundreds of entries, thus, the querying here has just been provided for demonstration. I've also included a function for scanning the appointments as opposed to querying, thus, either option can be made use of. Both the querying and scanning functions are shown below. 
+The retrieval of appointments between two dates for a specific owner can also be done using a *DynamoDBScanExpression*, however, scanning works through the whole table and can be quite expensive if the table is big. Querying, on the other hand, works by searching on key and is therefore more efficient. Evidently, for a simple application such as a personal diary, you most likely do not need to take into account the use of a query expression as your database likely won't contain hundreds of entries, thus, I have made use of a query expression solely for demonstration purposes. I've also included a function for scanning the appointments as opposed to querying as can be seen by the images below. Out of curiosity, for both the querying and scanning functions I calculate the time it takes to run each operation and as shown in section X, the test cases prove that with less than 100 appointments in the database, a scan expression can at some cases run faster than a query expression. 
 
 ![query](report-images/query.png)
 ![scan](report-images/scan.png)
+
+### AppointmentResource 
+
+#### Adding a new appointment 
+In order to add a new appointment, I specify the method to handle post requests using the *@POST* annotation from JAX-RS. Furthermore, I set the response content-type to plain text such that the server can respond with a status code and a plain-text response. If the adding of an appointment is successful, the server replies with a 201 status code implying that the appointment was successfully added to the database. If the adding of an appointment is unsuccessful, the server responds with a 400 status code to indicate that something went wrong. 
+
+![add](report-images/add.png)
+
+#### Retrieving an appointment by its ID 
+Here, I specify the method to handle get requests using the *@GET* annotation from JAX-RS. Additionally, I specify the response content-type as JSON and append the appointment ID to the path. The appointment is then retrieved from the database using the *findAppointmentById(id)* function mentioned above. If the appointment exists, I simply return the appointment, whereas, if the appointment cannot be found, I return a new *AppointmentNotFoundException* which is a custom exception case that extends the *WebApplicationException* class. The exception returns a 404 status code to imply that the appointment was not found with the given ID.
+
+![get](report-images/get.png)
+![aptnotfound](report-images/aptNotFound.png)
+
+#### Retrieving appointments between two specified dates
+To retrieve appointments for a specific owner between 2 specified dates, I also make use of the *@GET* annotation in order to handle the request. I append the owner, the start date, and the date to the path in which I separate each path parameter with a slash. The appointments for the owner can then be retrieved by either using the *queryAppointmentsBetweenDates* or *scanAppointmentsBetweenDates* function. If the appointments between the two given dates for the specified owner are found, then the appointments are simply returned as JSON, whereas, if the appointments cannot be found, a *AppointmentsNotFoundException* is returned which simply indicates to the user that the appointments for the specific owner could not be found. 
+
+![getbydate](report-images/getbydate.png)
+![aptsnotfound](report-images/aptsnotfound.png)
+
+#### Deleting an appointment given by its ID
+
+
+![deletebyid](report-images/deletebyid.png)
+
+#### Updating an appointment given by its ID 
+
+![updatebyid](report-images/updatebyid.png)
+
+## Client side 
+
+#### Adding a new appointment 
+To add a new appointment into the database, I make use of the jQuery Ajax function where I specify the type as 'PUT' as well as other necessary parameters. Most importantly, I pass in the data using the *formToJSON()* function shown below. This function converts the form entries into a JSON object using the *JSON.stringify()* method. If the adding of a new appointment is successful, I alert the client with the success message received from the back-end, whereas if if the adding is unsuccessful I alert the client with the error message.   
+
+![save](report-images/save-front.png)
+![form2json](report-images/form2json.png)
+
+
+#### Updating an appointment by its ID
+Similar to adding a new appointment, for updating an appointment I make use of the jQuery Ajax function where I specify the type as 'PUT' as well as pass in the data using the *formToJSON()* method mentioned above to convert the form entries into a JSON object. If the updating on an appointment is successful, I alert the client with the successful response message retrieved from the back-end, and with the error message if the updating failed. 
+
+![update-front](report-images/update-front.png)
+
+#### Deleting an appointment by its ID
+Likewise to updating an adding an appointment, when deleting an appointment given by its ID, I use the Ajax function in which I specify the type as 'DELETE', pass in the url, and alert the client with either the success message, or error message received from the back-end. 
+
+![delete-front](report-images/delete-front.png)
+
+#### Retrieving appointments for a specific owner between two dates
+In order to retrieve the appointments between two different dates, I make use of the jQuery shorthand Ajax function to retrieve the JSON data. Using a *forEach* loop, I retrieve all fields for each appointment. Since the date is being sent from the back-end to the front-end as a long value (timestamp), it's essential to convert the value to a JavaScript date object.
+
+```javascript
+var date = new Date(dateTime);
+```
+
+Once converted to a date object, I can simply receive the hours from the date object using:
+
+```javascript
+var hours = date.getHours();
+```
+
+as well as the minutes using: 
+
+```javascript
+var minutes = date.getMinutes();
+```
+
+Using the hours, minutes and duration I'm able to calculate the time when an appointment ends and display the appointment details in a clear and concise format as can be seen by the image below. 
+
+![duration-front](report-images/duration-format.png)
+![retrieve-front](report-images/retrieve-front.png)
