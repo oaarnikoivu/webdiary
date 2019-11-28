@@ -71,10 +71,10 @@ public class PersistentDB implements AppointmentDatabase {
 		Appointment appointment = new Appointment(
 				a.getAppointmentId(),
 				a.getDateAndTime(), 
-				a.getDuration(), 
+				Math.round(a.getDuration()), 
 				a.getOwner(), 
-				a.getDescription());
-			
+				a.getDescription()); 
+		
 		PersistentDB.dynamoDBMapper.save(appointment);
 	}
 
@@ -98,7 +98,7 @@ public class PersistentDB implements AppointmentDatabase {
 		
 		if (appointmentToUpdate != null) {
 			appointmentToUpdate.setDateAndTime(appointment.getDateAndTime());
-			appointmentToUpdate.setDuration(appointment.getDuration());
+			appointmentToUpdate.setDuration(Math.round(appointment.getDuration()));
 			appointmentToUpdate.setOwner(appointment.getOwner());
 			appointmentToUpdate.setDescription(appointment.getDescription());
 			

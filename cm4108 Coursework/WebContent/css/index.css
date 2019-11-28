@@ -26,3 +26,7 @@ input {
 #appointmentPopup section {
 	padding: 5px;
 }
+
+input[type=number] {
+    width: 208px;
+}

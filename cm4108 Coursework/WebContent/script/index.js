@@ -1,6 +1,6 @@
 const baseURL="api";
 let appointmentId = "1";
-var oldDate; 
+let oldDate; 
 
 //the document ready function
 try	{
@@ -36,9 +36,13 @@ function init() {
 		$('#appointmentDialog').dialog('open', true);
 		$('#appointmentDialog').dialog({title: 'Add Appointment'});
 		
+		// Make sure form fields have been filled in 
+		checkFields();
+		
 		$('#saveAppointment').show();
 		$('#updateAppointment').hide();
 		$('#deleteAppointment').hide();
+		
 	});
 	
 	// show appointment(s) click hander
@@ -74,7 +78,8 @@ function init() {
 			scrollbar: true,
 			zindex: 9999999
 		});
-	})
+	});
+	
 	
 	// save appointment on save clicked
 	$("#saveAppointment").click(function() {
@@ -104,7 +109,7 @@ function init() {
 function saveAppointment() {	
 	const url = baseURL + '/appointment';
 	
-	// use jQuery shorthand Ajax POST function
+	// use ajax with 'POST' 
 	$.ajax({
 		type: 'POST',
 		url: url,
@@ -200,6 +205,8 @@ function appointmentClicked(id) {
 	// open dialog
 	$('#appointmentDialog').dialog('open', true);
 	$('#appointmentDialog').dialog({title: 'Update Appointment'});
+	
+	checkFields();
 	
 	$('#saveAppointment').hide();
 	$('#updateAppointment').show();
@@ -367,9 +374,28 @@ function formToJSON() {
 		"owner": $('#owner').val().replace(/\s/g, ''),
 		"description": $('#description').val(),
 		"dateAndTime": d.getTime(),
-		"duration": $('#duration').val().replace(/\s/g, '')
+		"duration": $('#duration').val()
 	});
 }
 
+/** 
+ * Only enable the save appointment button if the form fields have been filled correctly 
+ * @returns
+ */
+function checkFields() {
+	$('#appointmentInput > input').keyup(function() {
+
+        var empty = false;
+        $('#appointmentInput > input').each(function() {
+            if ($(this).val() == '') {
+                empty = true;
+            }
+        });
+        
+        if (!empty) {
+        	$('#saveAppointment').removeAttr('disabled'); 
+        }
+    });
+}
 
 
