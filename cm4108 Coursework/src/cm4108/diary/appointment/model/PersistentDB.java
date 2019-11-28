@@ -71,7 +71,7 @@ public class PersistentDB implements AppointmentDatabase {
 		Appointment appointment = new Appointment(
 				a.getAppointmentId(),
 				a.getDateAndTime(), 
-				Math.round(a.getDuration()), 
+				Math.round(a.getDuration()),  // round duration to nearest integer to simplify front-end duration formatting
 				a.getOwner(), 
 				a.getDescription()); 
 		
@@ -98,7 +98,7 @@ public class PersistentDB implements AppointmentDatabase {
 		
 		if (appointmentToUpdate != null) {
 			appointmentToUpdate.setDateAndTime(appointment.getDateAndTime());
-			appointmentToUpdate.setDuration(Math.round(appointment.getDuration()));
+			appointmentToUpdate.setDuration(Math.round(appointment.getDuration())); // round duration to nearest integer to simplify front-end duration formatting
 			appointmentToUpdate.setOwner(appointment.getOwner());
 			appointmentToUpdate.setDescription(appointment.getDescription());
 			

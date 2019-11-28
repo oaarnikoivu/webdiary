@@ -206,8 +206,6 @@ function appointmentClicked(id) {
 	$('#appointmentDialog').dialog('open', true);
 	$('#appointmentDialog').dialog({title: 'Update Appointment'});
 	
-	checkFields();
-	
 	$('#saveAppointment').hide();
 	$('#updateAppointment').show();
 	$('#deleteAppointment').show();
@@ -248,7 +246,7 @@ function appointmentClicked(id) {
  */
 function updateAppointment(id) {
 	const url = baseURL + "/appointment/" + id;
-	
+		
 	$.ajax({
 		type: 'PUT',
 		url: url,
@@ -259,7 +257,6 @@ function updateAppointment(id) {
 		},
 		error: function(xhr, textStatus, errorThrown) {
 			alert('updateAppointment error: ' + textStatus);
-			console.log(xhr.responseText);
 		}
 	});
 }
@@ -369,13 +366,19 @@ function formToJSON() {
 		
 	var d = new Date(year, month, day, hours, minutes);
 	
-	// return a JSON object and remove any unnecessary whitespace 
-	return JSON.stringify({
-		"owner": $('#owner').val().replace(/\s/g, ''),
-		"description": $('#description').val(),
-		"dateAndTime": d.getTime(),
-		"duration": $('#duration').val()
-	});
+	if (isNaN(startTime.replace(':', ''))) {
+		alert('Start time input field must take in a time!')
+	} else {
+		// return a JSON object and remove any unnecessary whitespace 
+		return JSON.stringify({
+			"owner": $('#owner').val().replace(/\s/g, ''),
+			"description": $('#description').val(),
+			"dateAndTime": d.getTime(),
+			"duration": $('#duration').val()
+		});
+	}
+	
+	
 }
 
 /** 
@@ -397,5 +400,4 @@ function checkFields() {
         }
     });
 }
-
 

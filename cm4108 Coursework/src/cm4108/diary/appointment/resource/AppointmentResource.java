@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,18 +27,14 @@ public class AppointmentResource {
 	
 	private static AppointmentDatabase database = PersistentDB.getInstance();
 	
-	/**
+	/*
 	 * Add a new appointment
-	 * @param dateTime
-	 * @param duration
-	 * @param owner
-	 * @param description
 	 * @return
 	 */
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response addAppointment(Appointment appointment) {
-		try {
+		try {	
 			AppointmentResource.database.addAppointment(appointment);
 			return Response.status(201).entity("Appointment successfully added").build();
 		} catch (Exception e) {
@@ -47,7 +44,8 @@ public class AppointmentResource {
 					.build();
 		}
 	}
-
+	
+	
 	/**
 	 * Retrieve an appointment by its ID
 	 * @param appointmentId
@@ -65,6 +63,7 @@ public class AppointmentResource {
 	
 	/**
 	 * Retrieve appointments between two specified dates for a specific user 
+	 * I use the @NotNull annotation to ensure that the required parameters are passed in
 	 * @param fromDate
 	 * @param toDate
 	 * @return
@@ -74,9 +73,9 @@ public class AppointmentResource {
 	@Path("{owner}/{fromDate}/{toDate}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Appointment> retrieveAppointmentsFromDates(
-			@PathParam("owner") String owner,
-			@PathParam("fromDate") long fromDate, 
-			@PathParam("toDate") long toDate) throws ParseException {
+			@NotNull @PathParam("owner") String owner,
+			@NotNull @PathParam("fromDate") long fromDate, 
+			@NotNull @PathParam("toDate") long toDate) throws ParseException {
 		
 		// Uncomment to use DynamoDB query expression instead 
 		/* List<Appointment> appointments = (List<Appointment>) 
@@ -125,7 +124,7 @@ public class AppointmentResource {
 			AppointmentResource.database.updateAppointmentById(appointmentId, appointment);
 			return Response.status(200).entity("Appointment successfully updated.").build();
 		} catch (Exception e) {
-			return Response.status(400).entity("Missing parameters...").build();
+			return Response.status(400).entity("Trying to pass an invalid parameter!").build();
 		}
 	}
 	
