@@ -42,15 +42,15 @@
 			<section id="appointmentDialog">
 				<section id="appointmentInput">
 					<label>Owner:</label>
-					<input name="owner" type="text" id="owner" required>
+					<input name="owner" type="text" id="owner">
 					<label>Description:</label>
-					<input name="description" type="text" id="description" required> 
+					<input name="description" type="text" id="description"> 
 					<label>Date:</label>
-					<input name="date" type="text" id="addAppointmentDatepicker" required> 
+					<input name="date" type="text" id="addAppointmentDatepicker"> 
 					<label>Start time:</label>
-			   		<input name="startTime" type="text" id="timepicker" required>
+			   		<input name="startTime" type="text" id="timepicker">
 					<label>Duration:</label>
-			  		<input name="duration" type="text" pattern="[0-9]" id="duration" required> (minutes)
+			  		<input name="duration" type="number" pattern="[0-9]" id="duration"> (minutes)
 			  		</section>
 			  	<section>
 					<button type="submit" id="saveAppointment" disabled>Save</button>

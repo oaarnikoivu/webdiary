@@ -365,8 +365,8 @@ function formToJSON() {
 	var d = new Date(year, month, day, hours, minutes);
 	
 	var duration = $('#duration').val();
-	
-	// Check that start time field is a valid time and duration is a number
+		
+	// Check that start time field is a valid time
 	if (isNaN(startTime.replace(':', '')) || isNaN(duration)) {
 		alert('Input fields must take in the correct values!')
 	} else {

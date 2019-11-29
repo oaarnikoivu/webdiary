@@ -130,13 +130,13 @@ public class PersistentDB implements AppointmentDatabase {
         expression.put("#o", "owner");    
         queryExpression.withExpressionAttributeNames(expression);
 		
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         // Query the appointments using the query expression
         List<Appointment> appointments = PersistentDB.dynamoDBMapper.query(Appointment.class, queryExpression);
-        long endTime = System.currentTimeMillis();
+        //long endTime = System.currentTimeMillis();
         
         // Calculate time taken to query 
-        System.out.println("Querying time: " + (endTime - startTime));
+        //System.out.println("Querying time: " + (endTime - startTime));
 		
 		return appointments;	
 	}
@@ -162,12 +162,12 @@ public class PersistentDB implements AppointmentDatabase {
         expression.put("#o", "owner");    
         scanExpression.withExpressionAttributeNames(expression);
         
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         List<Appointment> appointments = PersistentDB.dynamoDBMapper.scan(Appointment.class, scanExpression);
-        long endTime = System.currentTimeMillis();
+        //long endTime = System.currentTimeMillis();
         
         // Calculate time taken to scan 
-        System.out.println("Scanning time: " + (endTime - startTime));
+        //System.out.println("Scanning time: " + (endTime - startTime));
         
         return appointments;
 				
