@@ -25,6 +25,8 @@ import cm4108.diary.appointment.model.PersistentDB;
 @Path("/appointment")
 public class AppointmentResource {
 	
+	private final String INCORRECT_PARAM_MESSAGE = "All input fields must be declared!";
+	
 	private static AppointmentDatabase database = PersistentDB.getInstance();
 	
 	/*
@@ -34,13 +36,24 @@ public class AppointmentResource {
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response addAppointment(Appointment appointment) {
-		try {	
+		try {
+		
+			// Make sure client is not sending empty parameters
+			// Check that owner and description are not empty strings and that they are the correct 'String' type
+			// Check that dateAndTime and duration are not equal to 0 since long and int automatically convert null values to 0
+			if (appointment.getOwner() == "" || appointment.getDescription() == "" 
+					|| !(appointment.getOwner() instanceof String) 
+					|| !(appointment.getDescription() instanceof String)) 
+				return Response.status(400).entity(INCORRECT_PARAM_MESSAGE).build();
+			if (appointment.getDateAndTime() == 0.0 || appointment.getDuration() == 0) 
+				return Response.status(400).entity(INCORRECT_PARAM_MESSAGE).build();
+			
 			AppointmentResource.database.addAppointment(appointment);
 			return Response.status(201).entity("Appointment successfully added").build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(400)
-					.entity("Something went wrong. Params accepted: owner, description, dateAndTime, duration")
+			return Response.status(500)
+					.entity("Adding a new appointment has failed!")
 					.build();
 		}
 	}
@@ -115,16 +128,28 @@ public class AppointmentResource {
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	@Path("{appointmentId}")
 	public Response updateAppointment(
 			@PathParam("appointmentId") String appointmentId,
 			Appointment appointment) {
 		
 		try {
+			
+			// Make sure client is not sending empty parameters
+			// Check that owner and description are not empty strings and that they are the correct 'String' type
+			// Check that dateAndTime and duration are not equal to 0 since long and int automatically convert null values to 0
+			if (appointment.getOwner() == "" || appointment.getDescription() == "" 
+					|| !(appointment.getOwner() instanceof String) 
+					|| !(appointment.getDescription() instanceof String)) 
+				return Response.status(400).entity(INCORRECT_PARAM_MESSAGE).build();
+			if (appointment.getDateAndTime() == 0.0 || appointment.getDuration() == 0) 
+				return Response.status(400).entity(INCORRECT_PARAM_MESSAGE).build();
+			
 			AppointmentResource.database.updateAppointmentById(appointmentId, appointment);
 			return Response.status(200).entity("Appointment successfully updated.").build();
 		} catch (Exception e) {
-			return Response.status(400).entity("Trying to pass an invalid parameter!").build();
+			return Response.status(500).entity("Updating an existing appointment has failed!").build();
 		}
 	}
 	

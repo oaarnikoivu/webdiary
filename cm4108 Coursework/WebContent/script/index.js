@@ -119,8 +119,7 @@ function saveAppointment() {
 			alert(xhr.responseText); // success message received from back-end
 		},
 		error: function(xhr, status, error) {
-			alert('saveAppointment error: ' + error);
-			console.log(xhr.responseText)
+			alert('saveAppointment error: ' + xhr.responseText); // error/warning message received form back-end 
 		}
 	});
 }
@@ -256,7 +255,7 @@ function updateAppointment(id) {
 			alert(xhr.responseText);
 		},
 		error: function(xhr, textStatus, errorThrown) {
-			alert('updateAppointment error: ' + textStatus);
+			alert('updateAppointment error: ' + xhr.responseText);
 		}
 	});
 }
@@ -276,10 +275,9 @@ function deleteAppointment(id) {
 			alert(xhr.responseText);
 		},
 		error: function(xhr, textStatus, errorThrown) {
-			alert('deleteAppointment error: ' + textStatus);
-			console.log(xhr.responseText);
+			alert('deleteAppointment error: ' + xhr.responseText);
 		}
-	})
+	});
 }
 
 /**
@@ -366,8 +364,11 @@ function formToJSON() {
 		
 	var d = new Date(year, month, day, hours, minutes);
 	
-	if (isNaN(startTime.replace(':', ''))) {
-		alert('Start time input field must take in a time!')
+	var duration = $('#duration').val();
+	
+	// Check that start time field is a valid time and duration is a number
+	if (isNaN(startTime.replace(':', '')) || isNaN(duration)) {
+		alert('Input fields must take in the correct values!')
 	} else {
 		// return a JSON object and remove any unnecessary whitespace 
 		return JSON.stringify({
@@ -377,8 +378,6 @@ function formToJSON() {
 			"duration": $('#duration').val()
 		});
 	}
-	
-	
 }
 
 /** 
