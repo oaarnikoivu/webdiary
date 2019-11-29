@@ -25,7 +25,7 @@ import cm4108.diary.appointment.model.PersistentDB;
 @Path("/appointment")
 public class AppointmentResource {
 	
-	private final String INCORRECT_PARAM_MESSAGE = "All input fields must be declared!";
+	private final String INCORRECT_PARAM_MESSAGE = "All input fields must be filled!";
 	
 	private static AppointmentDatabase database = PersistentDB.getInstance();
 	
